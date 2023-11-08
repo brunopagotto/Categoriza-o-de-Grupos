@@ -1,1 +1,1 @@
-# Categoriza-o-de-Grupos
+# Esse repositório contém um estudo acerca das categorizações de gênero no português brasileiro através de um questionário aplicado para cerca de 1000 participantes voluntários. Foram feitas análises descritivas, como gráficos, tabelas e estatísticas, e também testes de hipóteses para os tempos de resposta das questões, para comparar as proporções entre diferentes tipos de questão, e para variáveis sociodemográficas comparando as respostas dentro de diferentes grupos sociais.
