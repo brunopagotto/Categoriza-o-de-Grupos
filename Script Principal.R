@@ -2,14 +2,12 @@
 
 library(readr)
 library(ggplot2)
+library(dplyr)
 install.packages("writexl")
 library(writexl)
 
 dados_pavlovia <- read_csv("Dados (final) - cidades ajustadas.csv")
 View(dados_pavlovia)
-
-#dados_brutos <- read.csv("Dados (bruto).csv")
-
 
 # Excluir colunas indicadas no email
 colunas_para_excluir <- c("email", "email_rt", "responseDate", "isComplete",
@@ -36,7 +34,6 @@ dados$socioescolasuperior <- gsub("[[:punct:]]", " ", dados$socioescolasuperior)
 
 #cursos_para_excluir = c("letras", "linguistica", "estudos literarios",
 #                        "fonoaudiologia", "traducao", "teoria literaria")
-#dados = subset(dados, socioescolasuperior != cursos_para_excluir)
 
 tem_letras <- grepl("letras", dados$socioescolasuperior, ignore.case = TRUE)
 table(tem_letras)
@@ -71,9 +68,6 @@ dados$socionasc <- tolower(dados$socionasc)
 dados$socionasc <- iconv(dados$socionasc, to = "ASCII//TRANSLIT")
 dados$socionasc <- gsub("ç", "c", dados$socionasc)
 dados$socionasc <- gsub("[[:punct:]]", " ", dados$socionasc)
-
-# Ler biblioteca dplyr
-library(dplyr)
 
 # Todas as cidades e seus respectivos estados extraídos de uma biblioteca do Python chamada ufbr 
 # (https://pt.linkedin.com/pulse/estados-e-munic%C3%ADpios-brasileiros-em-python-sidon-duarte)
@@ -112,28 +106,6 @@ municipios_brasil$socionasc = gsub("moji mirim", "mogi mirim", municipios_brasil
 municipios_brasil$socionasc = gsub("embu", "embu das artes", municipios_brasil$socionasc)
 municipios_brasil$socionasc = gsub("diamante d oeste", "diamante do oeste", municipios_brasil$socionasc)
 
-# Encontre as linhas com elementos repetidos na coluna "Coluna1"
-#repeticoes <- municipios_brasil[duplicated(municipios_brasil$sociomora) | duplicated(municipios_brasil$sociomora, fromLast = TRUE), ]
-
-# Exiba as linhas com repetições
-#print(repeticoes)
-
-# Use inner_join para encontrar elementos comuns entre os dataframes
-#elementos_comuns <- inner_join(dados, repeticoes, by = c("sociomora" = "sociomora"))
-
-# Exiba os elementos comuns encontrados
-#print(elementos_comuns)
-
-# Encontre as linhas onde "termo_procurado" aparece na coluna "Coluna1"
-#linhas_com_termo <- municipios_brasil[municipios_brasil$sociomora == "rio branco", ]
-
-# Exiba as linhas encontradas
-#print(linhas_com_termo)
-
-# Encontre as linhas onde "termo_procurado" aparece na coluna "Coluna1"
-#linhas_com_termos <- dados[municipios_brasil$sociomora == "rio branco" & municipios_brasil$Estado == "AC", ]
-
-
 # Realize um join baseado na coluna 'Cidade'
 merged_df <- inner_join(dados[-c(2,4,5,76:85)], municipios_brasil, by = "sociomora")
 
@@ -144,7 +116,7 @@ repeticoes_tempo_resposta = merged_df[duplicated(merged_df$consentimento_rt) | d
 valores_unicos <- unique(repeticoes_tempo_resposta$sociomora)
 
 # Exiba os valores únicos
-#print(valores_unicos)
+print(valores_unicos)
 
 # Alterar nomes das cidades repetidas em diferentes estado no dataframe 
 # municipios_brasil incluindo o estado ao lado para ficar da mesma forma
@@ -169,7 +141,6 @@ merged_df$sociomora = merged_df$Estado
 merged_df = merged_df[-c(73,74)]
 
 
-library(dplyr)
 
 # Realize um join baseado na coluna 'Cidade'
 #df_aux <- inner_join(merged_df, municipios_brasil, by = "socionasc")
@@ -242,12 +213,6 @@ write.csv(banco_dados_atualizado, file = "Banco de Dados Atualizado.csv", row.na
 banco_dados_atualizado = read_csv("Banco de Dados Atualizado.csv")
 merged_df = banco_dados_atualizado
 
-# Instale e carregue as bibliotecas necessárias
-install.packages("knitr")
-install.packages("kableExtra")
-library(knitr)
-library(kableExtra)
-
 ### Escolaridade
 
 merged_df$socioescola = gsub("fund.inc", "Fundamental Incompleto", merged_df$socioescola)
@@ -279,23 +244,6 @@ grafico <- ggplot(merged_df, aes(x = socioescola)) +
 
 # Exiba o gráfico
 print(grafico)
-
-# Crie um dataframe de exemplo
-teste <- data.frame(
-  Nome = c("João", "Maria", "Pedro"),
-  Idade = c(30, 25, 35),
-  Pontuação = c(80, 90, 75)
-)
-
-# Crie uma tabela formatada com kable() e personalize-a com kableExtra()
-tabela_formatada <- kable(teste, "html") %>%
-  kable_styling(full_width = FALSE) %>%
-  column_spec(1, bold = TRUE) %>%
-  column_spec(2:3, color = "black") %>%
-  row_spec(0, bold = TRUE, color = "black")
-
-# Salve a tabela como uma imagem
-#save_kable(tabela_formatada, "tabela.png")
 
 # Tabela dos percentuais
 table(merged_df$socioescola)/1051
@@ -525,6 +473,7 @@ print(grafico)
 # Tabela dos percentuais
 table(merged_df$sociorenda)/1051
 
+
 ### Média das respostas de cada frase ###
 
 # Mudar inscrição nas respostas
@@ -534,7 +483,6 @@ merged_df <- as.data.frame(lapply(merged_df, function(x) gsub("exc.ani.macho", "
 merged_df <- as.data.frame(lapply(merged_df, function(x) gsub("exc.ani.femea", "Apenas Fêmeas", x)))
 merged_df <- as.data.frame(lapply(merged_df, function(x) gsub("exc.hum.homem", "Apenas Homens", x)))
 merged_df <- as.data.frame(lapply(merged_df, function(x) gsub("exc.hum.mul", "Apenas Mulheres", x)))
-
 
 # Tabelas dos testes
 j = 1
@@ -552,8 +500,6 @@ for (i in 1:25) {
 
 
 # Histogramas com todas as possíveis respostas para cada teste
-
-library(ggplot2)
 
 j = 1
 for (i in 1:25) {
@@ -587,11 +533,10 @@ for (i in 1:25) {
   print(grafico_histograma)
   
   # Salve o gráfico em um arquivo PNG com o nome "meu_grafico.png" e tamanho 800x600 pixels
-  ggsave(filename = paste("Hist - Teste ", i, ".png"), plot = grafico_histograma, width = 8, height = 6, dpi = 300)
+  ggsave(filename = paste("graficos_respostas/Hist - Teste ", i, ".png"), plot = grafico_histograma, width = 8, height = 6, dpi = 300)
   
   j = j + 2
 }
-
 
 
 ### Categorias Combinadas
@@ -607,412 +552,68 @@ merged_df <- as.data.frame(lapply(merged_df, function(x) gsub("exc.ani.femea", "
 merged_df <- as.data.frame(lapply(merged_df, function(x) gsub("exc.hum.homem", "Apenas Homens", x)))
 merged_df <- as.data.frame(lapply(merged_df, function(x) gsub("exc.hum.mul", "Apenas Mulheres", x)))
 
-
-dados_comb = merged_df
-dados_comb$Coluna_Combinada <- paste(merged_df$teste01, merged_df$teste02, merged_df$teste03, sep = ",")
-
-dados_comb = merged_df
-dados_comb$Coluna_Combinada <- paste(merged_df$teste04, merged_df$teste05, merged_df$teste06,
-                                     merged_df$teste07, merged_df$teste08, sep = ",")
-
-dados_comb = merged_df
-dados_comb$Coluna_Combinada <- paste(merged_df$teste09, merged_df$teste10, merged_df$teste11,
-                                     merged_df$teste12, merged_df$teste13, merged_df$teste14,
-                                     merged_df$teste15, sep = ",")
-
-dados_comb = merged_df
-dados_comb$Coluna_Combinada <- paste(merged_df$teste16, merged_df$teste17, merged_df$teste18,
-                                     merged_df$teste19, merged_df$teste20, merged_df$teste21,
-                                     merged_df$teste22, merged_df$teste23, merged_df$teste24,
-                                     merged_df$teste25, sep = ",")
-
-# Separe os valores por vírgulas em linhas individuais
-dados_empilhados <- dados_comb %>%
-  separate_rows(Coluna_Combinada, sep = ",")
-
-dados_empilhados$Coluna_Combinada <- factor(dados_empilhados$Coluna_Combinada, levels = ordem_desejada)
-
-table(dados_empilhados$Coluna_Combinada)
-table(dados_empilhados$Coluna_Combinada)/nrow(dados_empilhados)
-
-grafico_histograma_comb <- ggplot(dados_empilhados, aes(x = Coluna_Combinada, fill = Coluna_Combinada)) +
-  geom_bar() +
-  labs(title = "Histograma de Categorias Combinadas - Testes 16 a 25",
-       x = "Categoria Combinada",
-       y = "Contagem") +
-  scale_fill_manual(values = c("Apenas Fêmeas" = "pink",
-                               "Apenas Machos" = "blue",
-                               "Machos e Fêmeas" = "purple",
-                               "Apenas Mulheres" = "red",
-                               "Apenas Homens" = "green",
-                               "Homens e Mulheres" = "yellow")) +
-  theme_minimal() +
-  theme(legend.position = "none")  # Oculta a legenda de cores
-
-# Exiba o gráfico de histograma
-print(grafico_histograma_comb)
-
-# Salve o gráfico em um arquivo PNG com o nome "meu_grafico.png" e tamanho 800x600 pixels
-ggsave(filename = paste("graficos_respostas_categoria/Categoria 4.png"), plot = grafico_histograma_comb, width = 8, height = 6, dpi = 300)
-
-
-
-### Tempos de resposta
-
-# Estatísticas dos testes
-
-merged_df = banco_dados_atualizado
-
-# Crie vetores para armazenar os resultados
-medias <- numeric(25)
-variancias <- numeric(25)
-desvios_padrao <- numeric(25)
-minimos <- numeric(25)
-maximos <- numeric(25)
-soma <- numeric(25)
-
-# Use um loop para calcular as estatísticas para cada coluna
-j = 1
-for (i in 1:25) {
-  coluna <- merged_df[[23+j]]  # Acesse a coluna pelo índice
-  medias[i] <- mean(coluna)
-  variancias[i] <- var(coluna)
-  desvios_padrao[i] <- sd(coluna)
-  minimos[i] <- min(coluna)
-  maximos[i] <- max(coluna)
-  soma[i] <- sum(coluna)
-  j = j + 2
-}
-
-# Exiba os resultados
-resultados <- data.frame(
-  Teste = 1:25,
-  Media = medias,
-  Variancia = variancias,
-  Desvio_Padrao = desvios_padrao,
-  Minimo = minimos,
-  Maximo = maximos,
-  Soma = soma
-)
-
-write_xlsx(resultados, path = "Estatísticas - rt.xlsx")
-write.csv(resultados, file = "Estatísticas - rt.csv", row.names = FALSE)
-
-
-# Distribuição dos testes
-
-# Crie um loop para gerar os gráficos de distribuição
-j = 1
-for (i in 1:25) {
-  # Transforma a coluna em dados numéricos
-  merged_df[[j + 23]] = as.numeric(merged_df[[j + 23]])
-  
-  # Calcule os quartis
-  Q1 <- quantile(merged_df[[j + 23]], 0.25)
-  Q3 <- quantile(merged_df[[j + 23]], 0.75)
-  
-  # Calcule o intervalo interquartil (IQR)
-  IQR <- Q3 - Q1
-  
-  # Defina um limite inferior e superior para os outliers
-  limite_inferior <- Q1 - 1.5 * IQR
-  limite_superior <- Q3 + 1.5 * IQR
-  
-  # Remova os outliers da coluna
-  dados_sem_outliers <- merged_df[merged_df[[j + 23]] >= limite_inferior & merged_df[[j + 23]] <= limite_superior, ]
-  
-  # Realize o teste de normalidade (Shapiro-Wilk)
-  resultado_teste_normalidade <- shapiro.test(dados_sem_outliers[[j + 23]])
-  
-  # Distribuição dos dados sem outliers usando ggplot2
-  grafico_histograma <- ggplot(dados_sem_outliers, aes(x = dados_sem_outliers[[j + 23]])) +
-    geom_histogram(binwidth = 1) +  # Personalize o tamanho dos bins conforme necessário
-    labs(title = paste("Distribuição de RT - Teste", i),
-         x = "Valores",
-         y = "Frequência") +
-    geom_density(aes(y = ..count..), color = "blue") +  # Adicione a curva da distribuição normal
-    annotate("text", x = max(dados_sem_outliers[[j + 23]]) - 5, y = max(dados_sem_outliers$count) - 5,
-             label = ifelse(resultado_teste_normalidade$p.value < 0.05, "NÃO Normal", "Normal"),
-             color = "red", size = 5)  # Indique o resultado do teste de normalidade no gráfico
-  
-  # Salve o gráfico como um arquivo PNG (ou outro formato desejado)
-  nome_arquivo <- paste0("graficos_histograma/histograma_teste_", i, ".png")
-  ggsave(nome_arquivo, plot = grafico_histograma, width = 6, height = 4)  # Ajuste o tamanho conforme necessário
-  
-  j = j + 2
-}
-
-
-# Estatísticas das 4 categorias
-
-merged_df = banco_dados_atualizado
-
-# Mudar inscrição nas respostas
-merged_df <- as.data.frame(lapply(merged_df, function(x) gsub("neut.ani", "Machos e Fêmeas", x)))
-merged_df <- as.data.frame(lapply(merged_df, function(x) gsub("neut.hum", "Homens e Mulheres", x)))
-merged_df <- as.data.frame(lapply(merged_df, function(x) gsub("exc.ani.macho", "Apenas Machos", x)))
-merged_df <- as.data.frame(lapply(merged_df, function(x) gsub("exc.ani.femea", "Apenas Fêmeas", x)))
-merged_df <- as.data.frame(lapply(merged_df, function(x) gsub("exc.hum.homem", "Apenas Homens", x)))
-merged_df <- as.data.frame(lapply(merged_df, function(x) gsub("exc.hum.mul", "Apenas Mulheres", x)))
-
-
-# Crie vetores para armazenar os resultados
-medias <- numeric(4)
-variancias <- numeric(4)
-desvios_padrao <- numeric(4)
-minimos <- numeric(4)
-maximos <- numeric(4)
-soma <- numeric(4)
-
 for (i in 1:4){
   
-  if(i==1){
+  if(i == 1){
     dados_comb = merged_df
-    dados_comb$Coluna_Combinada <- paste(merged_df$teste01_rt, merged_df$teste02_rt, merged_df$teste03_rt, sep = ",")
+    dados_comb$Coluna_Combinada <- paste(merged_df$teste01, merged_df$teste02, merged_df$teste03, sep = ",")
+    num_testes = "1 a 3"
+    }
+  
+  if(i == 2){
+    dados_comb = merged_df
+    dados_comb$Coluna_Combinada <- paste(merged_df$teste04, merged_df$teste05, merged_df$teste06,
+                                         merged_df$teste07, merged_df$teste08, sep = ",")
+    num_testes = "4 a 8"
   }
   
-  if(i==2){
+  if(i == 3){
     dados_comb = merged_df
-    dados_comb$Coluna_Combinada <- paste(merged_df$teste04_rt, merged_df$teste05_rt, merged_df$teste06_rt,
-                                     merged_df$teste07_rt, merged_df$teste08_rt, sep = ",")
+    dados_comb$Coluna_Combinada <- paste(merged_df$teste09, merged_df$teste10, merged_df$teste11,
+                                         merged_df$teste12, merged_df$teste13, merged_df$teste14,
+                                         merged_df$teste15, sep = ",")
+    num_testes = "9 a 15"
   }
   
-  if(i==3){
+  if(i == 4){
     dados_comb = merged_df
-    dados_comb$Coluna_Combinada <- paste(merged_df$teste09_rt, merged_df$teste10_rt, merged_df$teste11_rt,
-                                     merged_df$teste12_rt, merged_df$teste13_rt, merged_df$teste14_rt,
-                                     merged_df$teste15_rt, sep = ",")
+    dados_comb$Coluna_Combinada <- paste(merged_df$teste16, merged_df$teste17, merged_df$teste18,
+                                         merged_df$teste19, merged_df$teste20, merged_df$teste21,
+                                         merged_df$teste22, merged_df$teste23, merged_df$teste24,
+                                         merged_df$teste25, sep = ",")
+    num_testes = "16 a 25"
   }
   
-  if(i==4){
-    dados_comb = merged_df
-    dados_comb$Coluna_Combinada <- paste(merged_df$teste16_rt, merged_df$teste17_rt, merged_df$teste18_rt,
-                                     merged_df$teste19_rt, merged_df$teste20_rt, merged_df$teste21_rt,
-                                     merged_df$teste22_rt, merged_df$teste23_rt, merged_df$teste24_rt,
-                                     merged_df$teste25_rt, sep = ",")
-  }
 
+  # Separe os valores por vírgulas em linhas individuais
   dados_empilhados <- dados_comb %>%
     separate_rows(Coluna_Combinada, sep = ",")
   
-  dados_empilhados$Coluna_Combinada = as.numeric(dados_empilhados$Coluna_Combinada)
+  dados_empilhados$Coluna_Combinada <- factor(dados_empilhados$Coluna_Combinada, levels = ordem_desejada)
   
-  coluna <- dados_empilhados[[length(dados_empilhados)]]  # Acesse a coluna pelo índice
-  medias[i] <- mean(coluna)
-  variancias[i] <- var(coluna)
-  desvios_padrao[i] <- sd(coluna)
-  minimos[i] <- min(coluna)
-  maximos[i] <- max(coluna)
-  soma[i] <- sum(coluna)
+  table(dados_empilhados$Coluna_Combinada)
+  table(dados_empilhados$Coluna_Combinada)/nrow(dados_empilhados)
   
-# Exiba os resultados por categoria
-  resultados_categoria <- data.frame(
-    Categoria = 1:4,
-    Media = medias,
-    Variancia = variancias,
-    Desvio_Padrao = desvios_padrao,
-    Minimo = minimos,
-    Maximo = maximos,
-    Soma = soma
-  )
+  grafico_histograma_comb <- ggplot(dados_empilhados, aes(x = Coluna_Combinada, fill = Coluna_Combinada)) +
+    geom_bar() +
+    labs(title = paste("Histograma de Categorias Combinadas - Testes", num_testes) ,
+         x = "Categoria Combinada",
+         y = "Contagem") +
+    scale_fill_manual(values = c("Apenas Fêmeas" = "pink",
+                                 "Apenas Machos" = "blue",
+                                 "Machos e Fêmeas" = "purple",
+                                 "Apenas Mulheres" = "red",
+                                 "Apenas Homens" = "green",
+                                 "Homens e Mulheres" = "yellow")) +
+    theme_minimal() +
+    theme(legend.position = "none")  # Oculta a legenda de cores
   
-}
-
-write_xlsx(resultados_categoria, path = "Estatísticas por Categoria - rt.xlsx")
-write.csv(resultados_categoria, file = "Estatísticas por Categoria - rt.csv", row.names = FALSE)
-
-
-### Testes de Hipóteses / ANOVA para o tempo de resposta das categorias
-
-# Suponha que você tenha as médias, variâncias/desvios padrão e o número de observações
-# em vetores ou variáveis separadas, como 'media', 'variancia', 'num_observacoes'
-
-# Defina a média da Categoria 3
-media_categoria_3 <- resultados_categoria$Media[3]
-
-# Crie um vetor com as médias das outras categorias
-outras_medias <- c(resultados_categoria$Media[1], resultados_categoria$Media[2], resultados_categoria$Media[4])
-
-# Crie um vetor com as variâncias ou desvios padrão das outras categorias
-outras_variancias <- c(resultados_categoria$Variancia[1], resultados_categoria$Variancia[2], resultados_categoria$Variancia[4])
-
-# Crie um vetor com o número de observações das outras categorias
-outras_observacoes <- c(3*nrow(merged_df), 5*nrow(merged_df), 10*nrow(merged_df))
-
-# Realize um teste t de duas amostras para comparar a Categoria 3 com cada outra categoria
-for (i in 1:length(outras_medias)) {
-  # Realize o teste t de duas amostras
-  resultado_teste <- t.test(x = c(media_categoria_3, outras_medias[i]), 
-                            y = c(sqrt(resultados_categoria$Variancia[3])/sqrt(7*nrow(merged_df)), 
-                                  sqrt(outras_variancias[i])/sqrt(outras_observacoes[i])),
-                            alternative = "greater")
+  # Exiba o gráfico de histograma
+  print(grafico_histograma_comb)
   
-  # Exiba o resultado do teste para cada comparação
-  if(i==3){
-    i = i + 1
-  }
-  print(paste("Comparação com a Categoria", i))
-  print(resultado_teste)
-}
-
-
-
-###
-
-# Defina a média da Categoria 3
-media_categoria_2 <- resultados_categoria$Media[2]
-
-# Crie um vetor com as médias das outras categorias
-outras_medias <- c(resultados_categoria$Media[1], resultados_categoria$Media[4])
-
-# Crie um vetor com as variâncias ou desvios padrão das outras categorias
-outras_variancias <- c(resultados_categoria$Variancia[1], resultados_categoria$Variancia[4])
-
-# Crie um vetor com o número de observações das outras categorias
-outras_observacoes <- c(3*nrow(merged_df), 10*nrow(merged_df))
-
-# Realize um teste t de duas amostras para comparar a Categoria 3 com cada outra categoria
-j = 1
-for (i in 1:length(outras_medias)) {
-  # Realize o teste t de duas amostras
-  resultado_teste <- t.test(x = c(media_categoria_2, outras_medias[i]), 
-                            y = c(sqrt(resultados_categoria$Variancia[2])/sqrt(5*nrow(merged_df)), 
-                                  sqrt(outras_variancias[i])/sqrt(outras_observacoes[i])),
-                            alternative = "greater")
-  
-  # Exiba o resultado do teste para cada comparação
-  print(paste("Comparação com a Categoria", j))
-  print(resultado_teste)
-  j = 4
-}
-
-
-###
-
-# Realize o teste t de duas amostras
-resultado_teste <- t.test(x = c(resultados_categoria$Media[1], resultados_categoria$Media[4]), 
-                          y = c(sqrt(resultados_categoria$Variancia[1])/sqrt(3*nrow(merged_df)), 
-                                sqrt(resultados_categoria$Variancia[4])/sqrt(10*nrow(merged_df))),
-                          alternative = "greater")
-
-# Exiba o resultado do teste para cada comparação
-print(paste("Comparação com a Categoria", 4))
-print(resultado_teste)
-
-
-
-print((resultados_categoria$Media[1] - resultados_categoria$Media[2])/(resultados_categoria$Desvio_Padrao[1]/sqrt(3*nrow(merged_df)) - resultados_categoria$Desvio_Padrao[2]/sqrt(5*nrow(merged_df))))
-
-print((resultados_categoria$Media[1] - resultados_categoria$Media[3])/(resultados_categoria$Desvio_Padrao[1]/sqrt(3*nrow(merged_df)) - resultados_categoria$Desvio_Padrao[3]/sqrt(7*nrow(merged_df))))
-
-print((resultados_categoria$Media[1] - resultados_categoria$Media[4])/(resultados_categoria$Desvio_Padrao[1]/sqrt(3*nrow(merged_df)) - resultados_categoria$Desvio_Padrao[4]/sqrt(10*nrow(merged_df))))
-
-print((resultados_categoria$Media[2] - resultados_categoria$Media[3])/(resultados_categoria$Desvio_Padrao[2]/sqrt(5*nrow(merged_df)) - resultados_categoria$Desvio_Padrao[3]/sqrt(7*nrow(merged_df))))
-
-print((resultados_categoria$Media[2] - resultados_categoria$Media[4])/(resultados_categoria$Desvio_Padrao[2]/sqrt(5*nrow(merged_df)) - resultados_categoria$Desvio_Padrao[4]/sqrt(10*nrow(merged_df))))
-
-print((resultados_categoria$Media[3] - resultados_categoria$Media[4])/(resultados_categoria$Desvio_Padrao[3]/sqrt(7*nrow(merged_df)) - resultados_categoria$Desvio_Padrao[4]/sqrt(10*nrow(merged_df))))
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-# Gráficos de pizza com todas as possíveis respostas para cada teste
-
-library(ggplot2)
-
-j = 1
-for (i in 1:25) {
-
-# Crie uma tabela de frequência das respostas
-tabela_frequencia <- table(merged_df[22 +j])
-j = j + 2
-
-# Crie um dataframe a partir da tabela de frequência
-df_frequencia <- as.data.frame(tabela_frequencia)
-
-# Renomeie as colunas para nomes mais descritivos
-colnames(df_frequencia) <- c("Resposta", "Contagem")
-
-# Crie o gráfico de pizza
-grafico_pizza <- ggplot(df_frequencia, aes(x = "", y = Contagem, fill = Resposta)) +
-  geom_bar(stat = "identity") +
-  coord_polar(theta = "y") +  # Transforma o gráfico em um gráfico de pizza
-  labs(title = "Distribuição de Respostas",
-       fill = "Resposta") +
-  scale_fill_manual(values = c("Apenas Fêmeas" = "pink", "Apenas Machos" = "blue", "Machos e Fêmeas" = "purple", "Apenas Mulheres" = "red", "Apenas Homens" = "green", "Homens e Mulheres" = "yellow")) +  # Defina cores personalizadas para as respostas
-  theme_minimal() +
-  theme(legend.position = "right")
-
-# Exiba o gráfico de pizza
-print(grafico_pizza)
+  # Salve o gráfico em um arquivo PNG com o nome "meu_grafico.png" e tamanho 800x600 pixels
+  ggsave(filename = paste("graficos_respostas_categoria/Categoria", i, ".png"), plot = grafico_histograma_comb, width = 8, height = 6, dpi = 300)
 
 }
-
-
-
-
-
-# load library
-library(ggplot2)
-
-teste_1 = merged_df[,c(1,23)]
-
-# Compute percentages
-teste_1$fraction = teste_1$count / sum(teste_1$count)
-
-# Compute the cumulative percentages (top of each rectangle)
-data$ymax = cumsum(data$fraction)
-
-# Compute the bottom of each rectangle
-data$ymin = c(0, head(data$ymax, n=-1))
-
-# Make the plot
-ggplot(data, aes(ymax=ymax, ymin=ymin, xmax=4, xmin=3, fill=category)) +
-  geom_rect() +
-  coord_polar(theta="y") + # Try to remove that to understand how the chart is built initially
-  xlim(c(2, 4)) # Try to remove that to see how to make a pie chart
-
-
-
-
-
-# Barras empilhadas para comparar dentro dos grupos
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 

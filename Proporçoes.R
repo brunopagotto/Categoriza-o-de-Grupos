@@ -1,5 +1,11 @@
+### Monografia Lucas - Proporções ###
 
-### Proporções ###
+library(readr)
+library(ggplot2)
+library(dplyr)
+library(tidyr)
+install.packages("writexl")
+library(writexl)
 
 # Selecionando apenas as colunas do banco de dados referente aos testes
 proporçoes = banco_dados_atualizado[,c(23:72)]
@@ -219,13 +225,3 @@ for (i in 1:3) {
     }
   }
 }
-
-
-
-
-
-
-
-p_ani_mas
-p_hum_fem
-p_hum_mas

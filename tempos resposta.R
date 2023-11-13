@@ -1,3 +1,12 @@
+### Monografia Lucas - Tempos de Resposta ###
+
+library(readr)
+library(ggplot2)
+library(dplyr)
+library(tidyr)
+install.packages("writexl")
+library(writexl)
+
 ### Dataframe apenas com os tempos de resposta
 
 tempos_resposta = banco_dados_atualizado[-73]
@@ -278,59 +287,6 @@ for (i in 1:4){
 write_xlsx(resultados_categoria, path = "Estatísticas por Categoria - rt.xlsx")
 write.csv(resultados_categoria, file = "Estatísticas por Categoria - rt.csv", row.names = FALSE)
 
-### até domingo
-# Outliers
-# Gráficos Distribuição
-# Transformação
-# Verificar Normalidade
-# Fazer testes para os testes dentro das categorias
-# Fazer testes para as categorias
-
-#dados_sem_outliers = tempos_resposta
-
-#which(dados_sem_outliers[,c(2:26)] < 1, arr.ind = TRUE)
-
-# Crie um loop para gerar os gráficos de distribuição
-#j = 1
-#questoes = 0
-for (i in 2:26) {
-  
-  # Calcule os quartis
-  media <- mean(dados_sem_outliers[[i]])
-  desvio_padrao <- sd(dados_sem_outliers[[i]])
-  
-  # Defina um limite inferior e superior para os outliers
-  limite_inferior <- media - 3 * desvio_padrao
-  limite_superior <- media + 3 * desvio_padrao
-  
-  # Remova os outliers da coluna
-  dados_sem_outliers <- dados_sem_outliers[dados_sem_outliers[[i]] >= limite_inferior & dados_sem_outliers[[i]] <= limite_superior, ]
-  
-  # Realize o teste de normalidade (Shapiro-Wilk)
-  resultado_teste_normalidade <- shapiro.test(dados_sem_outliers[[i]])
-  
-  # Questões que apresentaram normalidade dos dados
-  if(resultado_teste_normalidade$p.value > 0.05){
-    questoes[j] = paste("teste", i-1)
-    j=j+1
-  }
-  
-  # Distribuição dos dados sem outliers usando ggplot2
-  grafico_histograma <- ggplot(dados_sem_outliers, aes(x = dados_sem_outliers[[i]])) +
-    geom_histogram(binwidth = 1) +  # Personalize o tamanho dos bins conforme necessário
-    labs(title = paste("Distribuição de RT - Teste", i-1),
-         x = "Valores",
-         y = "Frequência")
-    
-      # Salve o gráfico como um arquivo PNG (ou outro formato desejado)
-  nome_arquivo <- paste0("graficos_histograma/histograma_teste_", i-1, ".png")
-  ggsave(nome_arquivo, plot = grafico_histograma, width = 6, height = 4)  # Ajuste o tamanho conforme necessário
-  
-}
-
-#write_xlsx(dados_sem_outliers, path = "Tempos Resposta Arrumados Sem Outliers.xlsx")
-#write.csv(dados_sem_outliers, file = "Tempos Resposta Arrumados Sem Outliers.csv", row.names = FALSE)
-
 
 ### Transformação logarítmica dos dados para ter normalidade
 
@@ -582,45 +538,3 @@ for (i in 1:3) {
     cat("Resultado do teste entre a categoria", i, "e a categoria", j,":", resultado_teste, "\n")
   }
 }
-
-
-# Realizar o teste t de Welch
-resultado_teste <- t.test(log_tempos_resposta$teste01_rt, log_tempos_resposta$teste02_rt, var.equal = FALSE)
-
-# Exibir os resultados do teste
-print(resultado_teste)
-
-
-
-
-# Crie um QQ-plot dos dados transformados
-qqnorm(dados_sem_outliers_2$teste01_rt)
-qqline(dados_sem_outliers_2$teste01_rt)
-
-which(dados_sem_outliers_2$teste25_rt < 1, arr.ind = TRUE)
-
-mean(dados_sem_outliers_2$teste01_rt) - 2*sd(dados_sem_outliers_2$teste01_rt)
-
-
-### DOMINGO: tentar log do log. Se ainda assim não funcionar, tratar como se
-### fosse uma distribuição normal
-
-
-#
-
-
-
-
-
-
-
-
-
-
-
-
-
-### semana que vêm
-# Testes de hipóteses para proporções nos testes dentro das categorias
-# Testes de hipóteses para proporções entre as categorias
-# Testes de hipóteses para proporções por variáveis sociodemográficas

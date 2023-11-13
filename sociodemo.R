@@ -1,3 +1,11 @@
+### Monografia Lucas - Sociodemográficas ###
+
+library(readr)
+library(ggplot2)
+library(dplyr)
+library(tidyr)
+install.packages("writexl")
+library(writexl)
 
 ### Análise das variáveis sociodemográficas ###
 
@@ -21,102 +29,132 @@ mulheres_cis = subset(sociodemo, socioidgenero == "Mulher (Cis)")
 homens_cis = subset(sociodemo, socioidgenero == "Homem (Cis)")
 
 # Mulheres
-dados_comb = mulheres_cis
-dados_comb$Coluna_Combinada <- paste(mulheres_cis$teste01, mulheres_cis$teste02, mulheres_cis$teste03, sep = ",")
+for (i in 1:4){
+  
+  if(i == 1){
+    dados_comb = mulheres_cis
+    dados_comb$Coluna_Combinada <- paste(mulheres_cis$teste01, mulheres_cis$teste02, mulheres_cis$teste03, sep = ",")
+    num_testes = "1 a 3"
+  }
+  
+  if(i == 2){
+    dados_comb = mulheres_cis
+    dados_comb$Coluna_Combinada <- paste(mulheres_cis$teste04, mulheres_cis$teste05, mulheres_cis$teste06,
+                                         mulheres_cis$teste07, mulheres_cis$teste08, sep = ",")
+    num_testes = "4 a 8"
+  }
+  
+  if(i == 3){
+    dados_comb = mulheres_cis
+    dados_comb$Coluna_Combinada <- paste(mulheres_cis$teste09, mulheres_cis$teste10, mulheres_cis$teste11,
+                                         mulheres_cis$teste12, mulheres_cis$teste13, mulheres_cis$teste14,
+                                         mulheres_cis$teste15, sep = ",")
+    num_testes = "9 a 15"
+  }
+  
+  if(i == 4){
+    dados_comb = mulheres_cis
+    dados_comb$Coluna_Combinada <- paste(mulheres_cis$teste16, mulheres_cis$teste17, mulheres_cis$teste18,
+                                         mulheres_cis$teste19, mulheres_cis$teste20, mulheres_cis$teste21,
+                                         mulheres_cis$teste22, mulheres_cis$teste23, mulheres_cis$teste24,
+                                         mulheres_cis$teste25, sep = ",")
+    num_testes = "16 a 25"
+  }
 
-dados_comb = mulheres_cis
-dados_comb$Coluna_Combinada <- paste(mulheres_cis$teste04, mulheres_cis$teste05, mulheres_cis$teste06,
-                                     mulheres_cis$teste07, mulheres_cis$teste08, sep = ",")
+  # Separe os valores por vírgulas em linhas individuais
+  dados_empilhados <- dados_comb %>%
+    separate_rows(Coluna_Combinada, sep = ",")
+  
+  dados_empilhados$Coluna_Combinada <- factor(dados_empilhados$Coluna_Combinada, levels = ordem_desejada)
+  
+  table(dados_empilhados$Coluna_Combinada)
+  table(dados_empilhados$Coluna_Combinada)/nrow(dados_empilhados)
+  
+  grafico_histograma_comb <- ggplot(dados_empilhados, aes(x = Coluna_Combinada, fill = Coluna_Combinada)) +
+    geom_bar() +
+    labs(title = paste("Respondentes Mulheres Cis - Testes", num_testes),
+         x = "Respostas",
+         y = "Contagem") +
+    scale_fill_manual(values = c("Apenas Fêmeas" = "pink",
+                                 "Apenas Machos" = "blue",
+                                 "Machos e Fêmeas" = "purple",
+                                 "Apenas Mulheres" = "red",
+                                 "Apenas Homens" = "green",
+                                 "Homens e Mulheres" = "yellow")) +
+    theme_minimal() +
+    theme(legend.position = "none")  # Oculta a legenda de cores
+  
+  # Exiba o gráfico de histograma
+  print(grafico_histograma_comb)
+  
+  # Salve o gráfico em um arquivo PNG com o nome "meu_grafico.png" e tamanho 800x600 pixels
+  ggsave(filename = paste("Mulheres/Categoria", i, ".png"), plot = grafico_histograma_comb, width = 8, height = 6, dpi = 300)
 
-dados_comb = mulheres_cis
-dados_comb$Coluna_Combinada <- paste(mulheres_cis$teste09, mulheres_cis$teste10, mulheres_cis$teste11,
-                                     mulheres_cis$teste12, mulheres_cis$teste13, mulheres_cis$teste14,
-                                     mulheres_cis$teste15, sep = ",")
-
-dados_comb = mulheres_cis
-dados_comb$Coluna_Combinada <- paste(mulheres_cis$teste16, mulheres_cis$teste17, mulheres_cis$teste18,
-                                     mulheres_cis$teste19, mulheres_cis$teste20, mulheres_cis$teste21,
-                                     mulheres_cis$teste22, mulheres_cis$teste23, mulheres_cis$teste24,
-                                     mulheres_cis$teste25, sep = ",")
-
-# Separe os valores por vírgulas em linhas individuais
-dados_empilhados <- dados_comb %>%
-  separate_rows(Coluna_Combinada, sep = ",")
-
-dados_empilhados$Coluna_Combinada <- factor(dados_empilhados$Coluna_Combinada, levels = ordem_desejada)
-
-table(dados_empilhados$Coluna_Combinada)
-table(dados_empilhados$Coluna_Combinada)/nrow(dados_empilhados)
-
-grafico_histograma_comb <- ggplot(dados_empilhados, aes(x = Coluna_Combinada, fill = Coluna_Combinada)) +
-  geom_bar() +
-  labs(title = "Respondentes Mulheres Cis - Testes 16 a 25",
-       x = "Respostas",
-       y = "Contagem") +
-  scale_fill_manual(values = c("Apenas Fêmeas" = "pink",
-                               "Apenas Machos" = "blue",
-                               "Machos e Fêmeas" = "purple",
-                               "Apenas Mulheres" = "red",
-                               "Apenas Homens" = "green",
-                               "Homens e Mulheres" = "yellow")) +
-  theme_minimal() +
-  theme(legend.position = "none")  # Oculta a legenda de cores
-
-# Exiba o gráfico de histograma
-print(grafico_histograma_comb)
-
-# Salve o gráfico em um arquivo PNG com o nome "meu_grafico.png" e tamanho 800x600 pixels
-ggsave(filename = paste("Mulheres/Categoria 4.png"), plot = grafico_histograma_comb, width = 8, height = 6, dpi = 300)
-
+}
 
 # Homens
-dados_comb = homens_cis
-dados_comb$Coluna_Combinada <- paste(homens_cis$teste01, homens_cis$teste02, homens_cis$teste03, sep = ",")
+for (i in 1:4){
+  
+  if(i == 1){
+    dados_comb = homens_cis
+    dados_comb$Coluna_Combinada <- paste(homens_cis$teste01, homens_cis$teste02, homens_cis$teste03, sep = ",")
+    num_testes = "1 a 3"
+  }
+  
+  if(i == 1){
+    dados_comb = homens_cis
+    dados_comb$Coluna_Combinada <- paste(homens_cis$teste04, homens_cis$teste05, homens_cis$teste06,
+                                         homens_cis$teste07, homens_cis$teste08, sep = ",")
+    num_testes = "4 a 8"
+  }
+  
+  if(i == 1){
+    dados_comb = homens_cis
+    dados_comb$Coluna_Combinada <- paste(homens_cis$teste09, homens_cis$teste10, homens_cis$teste11,
+                                         homens_cis$teste12, homens_cis$teste13, homens_cis$teste14,
+                                         homens_cis$teste15, sep = ",")
+    num_testes = "9 a 15"
+  }
+    
+  if(i == 1){
+    dados_comb = homens_cis
+    dados_comb$Coluna_Combinada <- paste(homens_cis$teste16, homens_cis$teste17, homens_cis$teste18,
+                                         homens_cis$teste19, homens_cis$teste20, homens_cis$teste21,
+                                         homens_cis$teste22, homens_cis$teste23, homens_cis$teste24,
+                                         homens_cis$teste25, sep = ",")
+    num_testes = "16 a 25"
+  }
+     
+    # Separe os valores por vírgulas em linhas individuais
+    dados_empilhados <- dados_comb %>%
+      separate_rows(Coluna_Combinada, sep = ",")
+    
+    dados_empilhados$Coluna_Combinada <- factor(dados_empilhados$Coluna_Combinada, levels = ordem_desejada)
+    
+    table(dados_empilhados$Coluna_Combinada)
+    table(dados_empilhados$Coluna_Combinada)/nrow(dados_empilhados)
+    
+    grafico_histograma_comb <- ggplot(dados_empilhados, aes(x = Coluna_Combinada, fill = Coluna_Combinada)) +
+      geom_bar() +
+      labs(title = paste("Respondentes Homens Cis - Testes", num_testes),
+           x = "Respostas",
+           y = "Contagem") +
+      scale_fill_manual(values = c("Apenas Fêmeas" = "pink",
+                                   "Apenas Machos" = "blue",
+                                   "Machos e Fêmeas" = "purple",
+                                   "Apenas Mulheres" = "red",
+                                   "Apenas Homens" = "green",
+                                   "Homens e Mulheres" = "yellow")) +
+      theme_minimal() +
+      theme(legend.position = "none")  # Oculta a legenda de cores
+    
+    # Exiba o gráfico de histograma
+    print(grafico_histograma_comb)
+    
+    # Salve o gráfico em um arquivo PNG com o nome "meu_grafico.png" e tamanho 800x600 pixels
+    ggsave(filename = paste("Homens/Categoria", i, ".png"), plot = grafico_histograma_comb, width = 8, height = 6, dpi = 300)
 
-dados_comb = homens_cis
-dados_comb$Coluna_Combinada <- paste(homens_cis$teste04, homens_cis$teste05, homens_cis$teste06,
-                                     homens_cis$teste07, homens_cis$teste08, sep = ",")
-
-dados_comb = homens_cis
-dados_comb$Coluna_Combinada <- paste(homens_cis$teste09, homens_cis$teste10, homens_cis$teste11,
-                                     homens_cis$teste12, homens_cis$teste13, homens_cis$teste14,
-                                     homens_cis$teste15, sep = ",")
-
-dados_comb = homens_cis
-dados_comb$Coluna_Combinada <- paste(homens_cis$teste16, homens_cis$teste17, homens_cis$teste18,
-                                     homens_cis$teste19, homens_cis$teste20, homens_cis$teste21,
-                                     homens_cis$teste22, homens_cis$teste23, homens_cis$teste24,
-                                     homens_cis$teste25, sep = ",")
-
-# Separe os valores por vírgulas em linhas individuais
-dados_empilhados <- dados_comb %>%
-  separate_rows(Coluna_Combinada, sep = ",")
-
-dados_empilhados$Coluna_Combinada <- factor(dados_empilhados$Coluna_Combinada, levels = ordem_desejada)
-
-table(dados_empilhados$Coluna_Combinada)
-table(dados_empilhados$Coluna_Combinada)/nrow(dados_empilhados)
-
-grafico_histograma_comb <- ggplot(dados_empilhados, aes(x = Coluna_Combinada, fill = Coluna_Combinada)) +
-  geom_bar() +
-  labs(title = "Respondentes Homens Cis - Testes 1 a 3",
-       x = "Respostas",
-       y = "Contagem") +
-  scale_fill_manual(values = c("Apenas Fêmeas" = "pink",
-                               "Apenas Machos" = "blue",
-                               "Machos e Fêmeas" = "purple",
-                               "Apenas Mulheres" = "red",
-                               "Apenas Homens" = "green",
-                               "Homens e Mulheres" = "yellow")) +
-  theme_minimal() +
-  theme(legend.position = "none")  # Oculta a legenda de cores
-
-# Exiba o gráfico de histograma
-print(grafico_histograma_comb)
-
-# Salve o gráfico em um arquivo PNG com o nome "meu_grafico.png" e tamanho 800x600 pixels
-ggsave(filename = paste("Homens/Categoria 1.png"), plot = grafico_histograma_comb, width = 8, height = 6, dpi = 300)
-
+}
 
 # Mulheres
 
@@ -316,102 +354,132 @@ heteros = subset(heteros, socioorient == "het")
 lgbt <- anti_join(sociodemo, heteros, by = "responseId")
 
 # Heteros
-dados_comb = heteros
-dados_comb$Coluna_Combinada <- paste(heteros$teste01, heteros$teste02, heteros$teste03, sep = ",")
+for (i in 1:4){
+  
+  if(i == 1){
+    dados_comb = heteros
+    dados_comb$Coluna_Combinada <- paste(heteros$teste01, heteros$teste02, heteros$teste03, sep = ",")
+    num_testes = "1 a 3"
+    }
+  
+  if(i == 2){  
+    dados_comb = heteros
+    dados_comb$Coluna_Combinada <- paste(heteros$teste04, heteros$teste05, heteros$teste06,
+                                        heteros$teste07, heteros$teste08, sep = ",")
+    num_testes = "4 a 8"
+    }
+  
+  if(i == 3){  
+    dados_comb = heteros
+    dados_comb$Coluna_Combinada <- paste(heteros$teste09, heteros$teste10, heteros$teste11,
+                                         heteros$teste12, heteros$teste13, heteros$teste14,
+                                         heteros$teste15, sep = ",")
+    num_testes = "9 a 15"
+    }
+  
+  if(i == 4){
+    dados_comb = heteros
+    dados_comb$Coluna_Combinada <- paste(heteros$teste16, heteros$teste17, heteros$teste18,
+                                         heteros$teste19, heteros$teste20, heteros$teste21,
+                                         heteros$teste22, heteros$teste23, heteros$teste24,
+                                         heteros$teste25, sep = ",")
+    num_testes = "16 a 25"
+    }
+  
+  # Separe os valores por vírgulas em linhas individuais
+  dados_empilhados <- dados_comb %>%
+    separate_rows(Coluna_Combinada, sep = ",")
+  
+  dados_empilhados$Coluna_Combinada <- factor(dados_empilhados$Coluna_Combinada, levels = ordem_desejada)
+  
+  table(dados_empilhados$Coluna_Combinada)
+  table(dados_empilhados$Coluna_Combinada)/nrow(dados_empilhados)
+  
+  grafico_histograma_comb <- ggplot(dados_empilhados, aes(x = Coluna_Combinada, fill = Coluna_Combinada)) +
+    geom_bar() +
+    labs(title = paste("Respondentes Heteros - Testes", num_testes),
+         x = "Respostas",
+         y = "Contagem") +
+    scale_fill_manual(values = c("Apenas Fêmeas" = "pink",
+                                 "Apenas Machos" = "blue",
+                                 "Machos e Fêmeas" = "purple",
+                                 "Apenas Mulheres" = "red",
+                                 "Apenas Homens" = "green",
+                                 "Homens e Mulheres" = "yellow")) +
+    theme_minimal() +
+    theme(legend.position = "none")  # Oculta a legenda de cores
+  
+  # Exiba o gráfico de histograma
+  print(grafico_histograma_comb)
+  
+  # Salve o gráfico em um arquivo PNG com o nome "meu_grafico.png" e tamanho 800x600 pixels
+  ggsave(filename = paste("Heteros/Categoria", i, ".png"), plot = grafico_histograma_comb, width = 8, height = 6, dpi = 300)
 
-dados_comb = heteros
-dados_comb$Coluna_Combinada <- paste(heteros$teste04, heteros$teste05, heteros$teste06,
-                                     heteros$teste07, heteros$teste08, sep = ",")
-
-dados_comb = heteros
-dados_comb$Coluna_Combinada <- paste(heteros$teste09, heteros$teste10, heteros$teste11,
-                                     heteros$teste12, heteros$teste13, heteros$teste14,
-                                     heteros$teste15, sep = ",")
-
-dados_comb = heteros
-dados_comb$Coluna_Combinada <- paste(heteros$teste16, heteros$teste17, heteros$teste18,
-                                     heteros$teste19, heteros$teste20, heteros$teste21,
-                                     heteros$teste22, heteros$teste23, heteros$teste24,
-                                     heteros$teste25, sep = ",")
-
-# Separe os valores por vírgulas em linhas individuais
-dados_empilhados <- dados_comb %>%
-  separate_rows(Coluna_Combinada, sep = ",")
-
-dados_empilhados$Coluna_Combinada <- factor(dados_empilhados$Coluna_Combinada, levels = ordem_desejada)
-
-table(dados_empilhados$Coluna_Combinada)
-table(dados_empilhados$Coluna_Combinada)/nrow(dados_empilhados)
-
-grafico_histograma_comb <- ggplot(dados_empilhados, aes(x = Coluna_Combinada, fill = Coluna_Combinada)) +
-  geom_bar() +
-  labs(title = "Respondentes Heteros - Testes 16 a 25",
-       x = "Respostas",
-       y = "Contagem") +
-  scale_fill_manual(values = c("Apenas Fêmeas" = "pink",
-                               "Apenas Machos" = "blue",
-                               "Machos e Fêmeas" = "purple",
-                               "Apenas Mulheres" = "red",
-                               "Apenas Homens" = "green",
-                               "Homens e Mulheres" = "yellow")) +
-  theme_minimal() +
-  theme(legend.position = "none")  # Oculta a legenda de cores
-
-# Exiba o gráfico de histograma
-print(grafico_histograma_comb)
-
-# Salve o gráfico em um arquivo PNG com o nome "meu_grafico.png" e tamanho 800x600 pixels
-ggsave(filename = paste("Heteros/Categoria 4.png"), plot = grafico_histograma_comb, width = 8, height = 6, dpi = 300)
-
-
+}
+  
 # LGBT
-dados_comb = lgbt
-dados_comb$Coluna_Combinada <- paste(lgbt$teste01, lgbt$teste02, lgbt$teste03, sep = ",")
-
-dados_comb = lgbt
-dados_comb$Coluna_Combinada <- paste(lgbt$teste04, lgbt$teste05, lgbt$teste06,
-                                     lgbt$teste07, lgbt$teste08, sep = ",")
-
-dados_comb = lgbt
-dados_comb$Coluna_Combinada <- paste(lgbt$teste09, lgbt$teste10, lgbt$teste11,
-                                     lgbt$teste12, lgbt$teste13, lgbt$teste14,
-                                     lgbt$teste15, sep = ",")
-
-dados_comb = lgbt
-dados_comb$Coluna_Combinada <- paste(lgbt$teste16, lgbt$teste17, lgbt$teste18,
-                                     lgbt$teste19, lgbt$teste20, lgbt$teste21,
-                                     lgbt$teste22, lgbt$teste23, lgbt$teste24,
-                                     lgbt$teste25, sep = ",")
-
-# Separe os valores por vírgulas em linhas individuais
-dados_empilhados <- dados_comb %>%
-  separate_rows(Coluna_Combinada, sep = ",")
-
-dados_empilhados$Coluna_Combinada <- factor(dados_empilhados$Coluna_Combinada, levels = ordem_desejada)
-
-table(dados_empilhados$Coluna_Combinada)
-table(dados_empilhados$Coluna_Combinada)/nrow(dados_empilhados)
-
-grafico_histograma_comb <- ggplot(dados_empilhados, aes(x = Coluna_Combinada, fill = Coluna_Combinada)) +
-  geom_bar() +
-  labs(title = "Respondentes LGBT - Testes 16 a 25",
-       x = "Respostas",
-       y = "Contagem") +
-  scale_fill_manual(values = c("Apenas Fêmeas" = "pink",
-                               "Apenas Machos" = "blue",
-                               "Machos e Fêmeas" = "purple",
-                               "Apenas Mulheres" = "red",
-                               "Apenas Homens" = "green",
-                               "Homens e Mulheres" = "yellow")) +
-  theme_minimal() +
-  theme(legend.position = "none")  # Oculta a legenda de cores
-
-# Exiba o gráfico de histograma
-print(grafico_histograma_comb)
-
-# Salve o gráfico em um arquivo PNG com o nome "meu_grafico.png" e tamanho 800x600 pixels
-ggsave(filename = paste("LGBT/Categoria 4.png"), plot = grafico_histograma_comb, width = 8, height = 6, dpi = 300)
-
+for (i in 1:4){
+  
+  if(i == 1){
+    dados_comb = lgbt
+    dados_comb$Coluna_Combinada <- paste(lgbt$teste01, lgbt$teste02, lgbt$teste03, sep = ",")
+    num_testes = "1 a 3"
+  }
+  
+  if(i == 2){  
+    dados_comb = lgbt
+    dados_comb$Coluna_Combinada <- paste(lgbt$teste04, lgbt$teste05, lgbt$teste06,
+                                         lgbt$teste07, lgbt$teste08, sep = ",")
+    num_testes = "4 a 8"
+  }
+  
+  if(i == 3){  
+    dados_comb = lgbt
+    dados_comb$Coluna_Combinada <- paste(lgbt$teste09, lgbt$teste10, lgbt$teste11,
+                                         lgbt$teste12, lgbt$teste13, lgbt$teste14,
+                                         lgbt$teste15, sep = ",")
+    num_testes = "9 a 15"
+  }
+  
+  if(i == 4){
+    dados_comb = lgbt
+    dados_comb$Coluna_Combinada <- paste(lgbt$teste16, lgbt$teste17, lgbt$teste18,
+                                         lgbt$teste19, lgbt$teste20, lgbt$teste21,
+                                         lgbt$teste22, lgbt$teste23, lgbt$teste24,
+                                         lgbt$teste25, sep = ",")
+    num_testes = "16 a 25"
+  }
+  
+  # Separe os valores por vírgulas em linhas individuais
+  dados_empilhados <- dados_comb %>%
+    separate_rows(Coluna_Combinada, sep = ",")
+  
+  dados_empilhados$Coluna_Combinada <- factor(dados_empilhados$Coluna_Combinada, levels = ordem_desejada)
+  
+  table(dados_empilhados$Coluna_Combinada)
+  table(dados_empilhados$Coluna_Combinada)/nrow(dados_empilhados)
+  
+  grafico_histograma_comb <- ggplot(dados_empilhados, aes(x = Coluna_Combinada, fill = Coluna_Combinada)) +
+    geom_bar() +
+    labs(title = paste("Respondentes LGBT - Testes", num_testes),
+         x = "Respostas",
+         y = "Contagem") +
+    scale_fill_manual(values = c("Apenas Fêmeas" = "pink",
+                                 "Apenas Machos" = "blue",
+                                 "Machos e Fêmeas" = "purple",
+                                 "Apenas Mulheres" = "red",
+                                 "Apenas Homens" = "green",
+                                 "Homens e Mulheres" = "yellow")) +
+    theme_minimal() +
+    theme(legend.position = "none")  # Oculta a legenda de cores
+  
+  # Exiba o gráfico de histograma
+  print(grafico_histograma_comb)
+  
+  # Salve o gráfico em um arquivo PNG com o nome "meu_grafico.png" e tamanho 800x600 pixels
+  ggsave(filename = paste("LGBT/Categoria", i, ".png"), plot = grafico_histograma_comb, width = 8, height = 6, dpi = 300)
+  
+}
 
 # Heteros
 
@@ -601,8 +669,6 @@ for (i in 1:4) {
 }
 
 
-
-
 ## Renda
 
 baixa_renda = subset(sociodemo, sociorenda == "n" | sociorenda == "0.5" | sociorenda == "0.5_1" |
@@ -611,101 +677,133 @@ baixa_renda = subset(sociodemo, sociorenda == "n" | sociorenda == "0.5" | socior
 alta_renda <- anti_join(sociodemo, baixa_renda, by = "responseId")
 
 # Baixa Renda
-dados_comb = baixa_renda
-dados_comb$Coluna_Combinada <- paste(baixa_renda$teste01, baixa_renda$teste02, baixa_renda$teste03, sep = ",")
-
-dados_comb = baixa_renda
-dados_comb$Coluna_Combinada <- paste(baixa_renda$teste04, baixa_renda$teste05, baixa_renda$teste06,
-                                     baixa_renda$teste07, baixa_renda$teste08, sep = ",")
-
-dados_comb = baixa_renda
-dados_comb$Coluna_Combinada <- paste(baixa_renda$teste09, baixa_renda$teste10, baixa_renda$teste11,
-                                     baixa_renda$teste12, baixa_renda$teste13, baixa_renda$teste14,
-                                     baixa_renda$teste15, sep = ",")
-
-dados_comb = baixa_renda
-dados_comb$Coluna_Combinada <- paste(baixa_renda$teste16, baixa_renda$teste17, baixa_renda$teste18,
-                                     baixa_renda$teste19, baixa_renda$teste20, baixa_renda$teste21,
-                                     baixa_renda$teste22, baixa_renda$teste23, baixa_renda$teste24,
-                                     baixa_renda$teste25, sep = ",")
-
-# Separe os valores por vírgulas em linhas individuais
-dados_empilhados <- dados_comb %>%
-  separate_rows(Coluna_Combinada, sep = ",")
-
-dados_empilhados$Coluna_Combinada <- factor(dados_empilhados$Coluna_Combinada, levels = ordem_desejada)
-
-table(dados_empilhados$Coluna_Combinada)
-table(dados_empilhados$Coluna_Combinada)/nrow(dados_empilhados)
-
-grafico_histograma_comb <- ggplot(dados_empilhados, aes(x = Coluna_Combinada, fill = Coluna_Combinada)) +
-  geom_bar() +
-  labs(title = "Respondentes Até 5 S.M. - Testes 16 a 25",
-       x = "Respostas",
-       y = "Contagem") +
-  scale_fill_manual(values = c("Apenas Fêmeas" = "pink",
-                               "Apenas Machos" = "blue",
-                               "Machos e Fêmeas" = "purple",
-                               "Apenas Mulheres" = "red",
-                               "Apenas Homens" = "green",
-                               "Homens e Mulheres" = "yellow")) +
-  theme_minimal() +
-  theme(legend.position = "none")  # Oculta a legenda de cores
-
-# Exiba o gráfico de histograma
-print(grafico_histograma_comb)
-
-# Salve o gráfico em um arquivo PNG com o nome "meu_grafico.png" e tamanho 800x600 pixels
-ggsave(filename = paste("Até 5 S.M./Categoria 4.png"), plot = grafico_histograma_comb, width = 8, height = 6, dpi = 300)
+for (i in 1:4){
+  
+  if(i == 1){
+    dados_comb = baixa_renda
+    dados_comb$Coluna_Combinada <- paste(baixa_renda$teste01, baixa_renda$teste02, baixa_renda$teste03, sep = ",")
+    num_testes = "1 a 3"
+  }
+  
+  if(i == 2){  
+    dados_comb = baixa_renda
+    dados_comb$Coluna_Combinada <- paste(baixa_renda$teste04, baixa_renda$teste05, baixa_renda$teste06,
+                                         baixa_renda$teste07, baixa_renda$teste08, sep = ",")
+    num_testes = "4 a 8"
+  }
+  
+  if(i == 3){  
+    dados_comb = baixa_renda
+    dados_comb$Coluna_Combinada <- paste(baixa_renda$teste09, baixa_renda$teste10, baixa_renda$teste11,
+                                         baixa_renda$teste12, baixa_renda$teste13, baixa_renda$teste14,
+                                         baixa_renda$teste15, sep = ",")
+    num_testes = "9 a 15"
+  }
+  
+  if(i == 4){
+    dados_comb = baixa_renda
+    dados_comb$Coluna_Combinada <- paste(baixa_renda$teste16, baixa_renda$teste17, baixa_renda$teste18,
+                                         baixa_renda$teste19, baixa_renda$teste20, baixa_renda$teste21,
+                                         baixa_renda$teste22, baixa_renda$teste23, baixa_renda$teste24,
+                                         baixa_renda$teste25, sep = ",")
+    num_testes = "16 a 25"
+  }
+  
+  # Separe os valores por vírgulas em linhas individuais
+  dados_empilhados <- dados_comb %>%
+    separate_rows(Coluna_Combinada, sep = ",")
+  
+  dados_empilhados$Coluna_Combinada <- factor(dados_empilhados$Coluna_Combinada, levels = ordem_desejada)
+  
+  table(dados_empilhados$Coluna_Combinada)
+  table(dados_empilhados$Coluna_Combinada)/nrow(dados_empilhados)
+  
+  grafico_histograma_comb <- ggplot(dados_empilhados, aes(x = Coluna_Combinada, fill = Coluna_Combinada)) +
+    geom_bar() +
+    labs(title = paste("Respondentes Até 5 S.M. - Testes", num_testes),
+         x = "Respostas",
+         y = "Contagem") +
+    scale_fill_manual(values = c("Apenas Fêmeas" = "pink",
+                                 "Apenas Machos" = "blue",
+                                 "Machos e Fêmeas" = "purple",
+                                 "Apenas Mulheres" = "red",
+                                 "Apenas Homens" = "green",
+                                 "Homens e Mulheres" = "yellow")) +
+    theme_minimal() +
+    theme(legend.position = "none")  # Oculta a legenda de cores
+  
+  # Exiba o gráfico de histograma
+  print(grafico_histograma_comb)
+  
+  # Salve o gráfico em um arquivo PNG com o nome "meu_grafico.png" e tamanho 800x600 pixels
+  ggsave(filename = paste("Até 5 S.M./Categoria", i, ".png"), plot = grafico_histograma_comb, width = 8, height = 6, dpi = 300)
+  
+}
 
 
 # Alta Renda
-dados_comb = alta_renda
-dados_comb$Coluna_Combinada <- paste(alta_renda$teste01, alta_renda$teste02, alta_renda$teste03, sep = ",")
-
-dados_comb = alta_renda
-dados_comb$Coluna_Combinada <- paste(alta_renda$teste04, alta_renda$teste05, alta_renda$teste06,
-                                     alta_renda$teste07, alta_renda$teste08, sep = ",")
-
-dados_comb = alta_renda
-dados_comb$Coluna_Combinada <- paste(alta_renda$teste09, alta_renda$teste10, alta_renda$teste11,
-                                     alta_renda$teste12, alta_renda$teste13, alta_renda$teste14,
-                                     alta_renda$teste15, sep = ",")
-
-dados_comb = alta_renda
-dados_comb$Coluna_Combinada <- paste(alta_renda$teste16, alta_renda$teste17, alta_renda$teste18,
-                                     alta_renda$teste19, alta_renda$teste20, alta_renda$teste21,
-                                     alta_renda$teste22, alta_renda$teste23, alta_renda$teste24,
-                                     alta_renda$teste25, sep = ",")
-
-# Separe os valores por vírgulas em linhas individuais
-dados_empilhados <- dados_comb %>%
-  separate_rows(Coluna_Combinada, sep = ",")
-
-dados_empilhados$Coluna_Combinada <- factor(dados_empilhados$Coluna_Combinada, levels = ordem_desejada)
-
-table(dados_empilhados$Coluna_Combinada)
-table(dados_empilhados$Coluna_Combinada)/nrow(dados_empilhados)
-
-grafico_histograma_comb <- ggplot(dados_empilhados, aes(x = Coluna_Combinada, fill = Coluna_Combinada)) +
-  geom_bar() +
-  labs(title = "Respondentes Acima de 5 S.M. - Testes 16 a 25",
-       x = "Respostas",
-       y = "Contagem") +
-  scale_fill_manual(values = c("Apenas Fêmeas" = "pink",
-                               "Apenas Machos" = "blue",
-                               "Machos e Fêmeas" = "purple",
-                               "Apenas Mulheres" = "red",
-                               "Apenas Homens" = "green",
-                               "Homens e Mulheres" = "yellow")) +
-  theme_minimal() +
-  theme(legend.position = "none")  # Oculta a legenda de cores
-
-# Exiba o gráfico de histograma
-print(grafico_histograma_comb)
-
-# Salve o gráfico em um arquivo PNG com o nome "meu_grafico.png" e tamanho 800x600 pixels
-ggsave(filename = paste("Acima de 5 S.M./Categoria 4.png"), plot = grafico_histograma_comb, width = 8, height = 6, dpi = 300)
+for (i in 1:4){
+  
+  if(i == 1){
+    dados_comb = alta_renda
+    dados_comb$Coluna_Combinada <- paste(alta_renda$teste01, alta_renda$teste02, alta_renda$teste03, sep = ",")
+    num_testes = "1 a 3"
+  }
+  
+  if(i == 2){  
+    dados_comb = alta_renda
+    dados_comb$Coluna_Combinada <- paste(alta_renda$teste04, alta_renda$teste05, alta_renda$teste06,
+                                         alta_renda$teste07, alta_renda$teste08, sep = ",")
+    num_testes = "4 a 8"
+  }
+  
+  if(i == 3){  
+    dados_comb = alta_renda
+    dados_comb$Coluna_Combinada <- paste(alta_renda$teste09, alta_renda$teste10, alta_renda$teste11,
+                                         alta_renda$teste12, alta_renda$teste13, alta_renda$teste14,
+                                         alta_renda$teste15, sep = ",")
+    num_testes = "9 a 15"
+  }
+  
+  if(i == 4){
+    dados_comb = alta_renda
+    dados_comb$Coluna_Combinada <- paste(alta_renda$teste16, alta_renda$teste17, alta_renda$teste18,
+                                         alta_renda$teste19, alta_renda$teste20, alta_renda$teste21,
+                                         alta_renda$teste22, alta_renda$teste23, alta_renda$teste24,
+                                         alta_renda$teste25, sep = ",")
+    num_testes = "16 a 25"
+  }
+  
+  # Separe os valores por vírgulas em linhas individuais
+  dados_empilhados <- dados_comb %>%
+    separate_rows(Coluna_Combinada, sep = ",")
+  
+  dados_empilhados$Coluna_Combinada <- factor(dados_empilhados$Coluna_Combinada, levels = ordem_desejada)
+  
+  table(dados_empilhados$Coluna_Combinada)
+  table(dados_empilhados$Coluna_Combinada)/nrow(dados_empilhados)
+  
+  grafico_histograma_comb <- ggplot(dados_empilhados, aes(x = Coluna_Combinada, fill = Coluna_Combinada)) +
+    geom_bar() +
+    labs(title = paste("Respondentes Acima de 5 S.M. - Testes", num_testes),
+         x = "Respostas",
+         y = "Contagem") +
+    scale_fill_manual(values = c("Apenas Fêmeas" = "pink",
+                                 "Apenas Machos" = "blue",
+                                 "Machos e Fêmeas" = "purple",
+                                 "Apenas Mulheres" = "red",
+                                 "Apenas Homens" = "green",
+                                 "Homens e Mulheres" = "yellow")) +
+    theme_minimal() +
+    theme(legend.position = "none")  # Oculta a legenda de cores
+  
+  # Exiba o gráfico de histograma
+  print(grafico_histograma_comb)
+  
+  # Salve o gráfico em um arquivo PNG com o nome "meu_grafico.png" e tamanho 800x600 pixels
+  ggsave(filename = paste("Acima de 5 S.M./Categoria", i, ".png"), plot = grafico_histograma_comb, width = 8, height = 6, dpi = 300)
+  
+}
 
 
 # Baixa Renda
